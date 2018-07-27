@@ -2,6 +2,7 @@ from flask import Flask
 
 from .api.routes import api_bp, api
 from .config import Config, RouteConfig
+from .extensions import db
 from .responses import ErrorResponse
 
 def init_app():
@@ -16,6 +17,9 @@ def init_app():
     # initialize the route
     init_route(app)
 
+    # initialize the database
+    init_db(app)
+
     # initialize error handler
     init_errorhandler(api)
 
@@ -27,6 +31,20 @@ def init_config(app):
     """
     app.config.from_object(Config)
 
+
+def init_db(app):
+    """ Initialize the database setting
+    """
+
+    db_uri = Config.DB_URI
+    if not db_uri:
+        raise Exception("No DB_URI in env file!")
+
+    app.config['SQLALCHEMY_TRACK_MODIFIACTIONS'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+
+    with app.app_context():
+        db.init_app(app)
 
 def init_route(app):
     """ Initialize tha routing for the app
