@@ -14,9 +14,21 @@ class UserWrongPassword(Exception):
     pass
 
 
+class InvalidPictureFormat(Exception):
+    pass
+
+
 class JWTExpireTime(Exception):
     pass
 
 
 class InvalidJWTToken(Exception):
+    pass
+
+
+class NoAuthToken(Exception):
+    pass
+
+
+class UploadPictureFail(Exception):
     pass
