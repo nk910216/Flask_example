@@ -19,5 +19,5 @@ class ErrorResponse(APIResponse):
 
     def __init__(self, code, message):
         APIResponse.__init__(self, {})
-        self.retValue['code']: code
-        self.retValue['message']: message
+        self.retValue['code'] = code
+        self.retValue['message'] =  message
