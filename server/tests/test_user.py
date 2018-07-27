@@ -61,3 +61,15 @@ class UserTest(BaseTest):
 
         input_data = UserSchema().load(correct_input)
         self.assertTrue(input_data.errors != {})
+
+    def test_user_jwt_token(self):
+
+        user = User()
+        user.set_data(username=self.TEST_USER_NAME,
+                      password=self.TEST_USER_PASSWORD)
+        user.add_user()
+        user_id = user.id
+
+        jwt_token = user.encode_auth_token()
+        decode_user_id = User.decode_auth_token(jwt_token)
+        self.assertEqual(user_id, decode_user_id)
