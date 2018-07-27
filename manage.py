@@ -1,7 +1,8 @@
 # -*- coing: utf-8
-import unittest
+import pytest
 
 from server import init_app
+from server.extensions import db
 
 # Init the app and connect to the manager
 app = init_app()
@@ -10,8 +11,12 @@ app = init_app()
 def test():
     """ Runs the tests
     """
-    tests = unittest.TestLoader().discover('server', pattern='test*.py')
-    result = unittest.TextTestRunner(verbosity=2).run(tests)
-    if result.wasSuccessful():
-        return 0
-    return 1
+    return pytest.main(['-s', 'server/tests', ])
+
+
+@app.cli.command()
+def create_table():
+    """ Creates the table
+    """
+    db.create_all()
+    db.session.commit()
