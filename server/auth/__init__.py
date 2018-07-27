@@ -1,2 +1,2 @@
-from .view import RegisterHandler
+from .view import RegisterHandler, LoginHandler
 from .model import User
