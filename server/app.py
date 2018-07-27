@@ -73,3 +73,13 @@ def init_errorhandler(api):
     def user_already_exist_handler(error):
         ret = ErrorResponse(code=3, message="USER ALREADY EXIST")
         return ret.get_json(), 409
+
+    @api.errorhandler(exceptions.UsernameNotExist)
+    def user_not_exist(error):
+        ret = ErrorResponse(code=4, message="USER NOT EXIST")
+        return ret.get_json(), 404
+
+    @api.errorhandler(exceptions.UserWrongPassword)
+    def user_wrong_password(error):
+        ret = ErrorResponse(code=5, message="USER WRONG PASSWORD")
+        return ret.get_json(), 401
