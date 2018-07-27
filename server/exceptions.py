@@ -32,3 +32,7 @@ class NoAuthToken(Exception):
 
 class UploadPictureFail(Exception):
     pass
+
+
+class InvalidArgs(Exception):
+    pass

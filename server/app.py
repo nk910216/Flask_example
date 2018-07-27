@@ -60,6 +60,7 @@ def init_errorhandler(api):
     """
     @api.errorhandler
     def internal_error_handler(error):
+        print('error: ', error)
         current_app.logger.error(error)
         ret = ErrorResponse(code=1, message="SOMETHING WRONG WITH THE SERVER")
         return ret.get_json(), 500
@@ -108,3 +109,8 @@ def init_errorhandler(api):
     def upload_picture_fail(error):
         ret = ErrorResponse(code=10, message="UPLOAD PICTURE FAIL")
         return ret.get_json(), 500
+
+    @api.errorhandler(exceptions.InvalidArgs)
+    def invalid_args(error):
+        ret = ErrorResponse(code=2, message="INVALID QUERY ARGS")
+        return ret.get_json(), 400
