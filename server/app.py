@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, current_app
 
 from .api.routes import api_bp, api
 from .config import Config, RouteConfig
 from .extensions import db
+from . import exceptions
 from .responses import ErrorResponse
 
 def init_app():
@@ -59,5 +60,16 @@ def init_errorhandler(api):
     """
     @api.errorhandler
     def internal_error_handler(error):
+        current_app.logger.error(error)
         ret = ErrorResponse(code=1, message="SOMETHING WRONG WITH THE SERVER")
         return ret.get_json(), 500
+
+    @api.errorhandler(exceptions.InvalidPostContent)
+    def invalid_post_content_handler(error):
+        ret = ErrorResponse(code=2, message="INVALID POST CONTENT")
+        return ret.get_json(), 400
+
+    @api.errorhandler(exceptions.UserAlreadyExist)
+    def user_already_exist_handler(error):
+        ret = ErrorResponse(code=3, message="USER ALREADY EXIST")
+        return ret.get_json(), 409
