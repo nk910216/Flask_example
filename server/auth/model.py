@@ -1,9 +1,11 @@
 import binascii
+import datetime
 import hashlib
 import secrets
 import uuid
 
 from flask import current_app
+import jwt
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -65,5 +67,25 @@ class User(db.Model):
                 db.session.rollback()
                 current_app.logger.error(e)
                 raise e
+
+    def encode_auth_token(self):
+        payload = {
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(
+                seconds=1800,
+            ),
+            'iat': datetime.datetime.utcnow(),
+            'sub': self.id
+        }
+        return jwt.encode(
+            payload,
+            current_app.config.get('SECRET_KEY'),
+            algorithm='HS256',
+        )
+
+    @classmethod
+    def decode_auth_token(self, auth_token):
+        payload = jwt.decode(
+            auth_token, current_app.config.get('SECRET_KEY'))
+        return payload['sub']
 
 
