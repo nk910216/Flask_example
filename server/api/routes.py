@@ -8,3 +8,4 @@ api = Api(api_bp)
 
 # auth
 api.add_resource(auth.RegisterHandler, '/user/register')
+api.add_resource(auth.LoginHandler, '/user/login')
