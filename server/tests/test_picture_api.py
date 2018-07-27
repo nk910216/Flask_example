@@ -4,7 +4,9 @@ from io import BytesIO
 from flask import json
 from PIL import Image
 
+from server.auth import User
 from server.picture import Picture
+from server.extensions import db
 
 from .base import BaseTest
 
@@ -115,3 +117,62 @@ class PictureApiTest(BaseTest):
                                  data=request_data,
                                  headers=request_header)
         self.assertEqual(response.status_code, 401)
+
+
+    def test_get_picture_without_username(self):
+
+        picture_input = {
+            "data": bytes.decode(self.picture_base64_str)
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(picture_input)
+        response = self.app.post('/api/picture',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 201)
+
+        # get data
+        response = self.app.get('/api/picture',
+                                headers=request_header)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertIn("pictures", response_data["data"])
+        self.assertIn("total", response_data["data"])
+        self.assertIn("page", response_data["data"])
+        self.assertIn("limit", response_data["data"])
+
+        self.assertEqual(1, len(response_data["data"]["pictures"]))
+        pic = response_data["data"]["pictures"][0]
+        self.assertIn("data", pic)
+        self.assertIn("username", pic)
+        self.assertIn("id", pic)
+
+        # campare the only one image
+        self.assertEqual(picture_input["data"], pic["data"])
+
+    def test_get_picture_with_nonexist_username(self):
+
+        picture_input = {
+            "data": bytes.decode(self.picture_base64_str)
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(picture_input)
+        response = self.app.post('/api/picture',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 201)
+
+        # get data
+        non_exist_user = "non_exist"
+        response = self.app.get('/api/picture?username={}'.format(non_exist_user),
+                                headers=request_header)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertIn("pictures", response_data["data"])
+        self.assertIn("total", response_data["data"])
+        self.assertIn("page", response_data["data"])
+        self.assertIn("limit", response_data["data"])
+
+        self.assertEqual(0, len(response_data["data"]["pictures"]))
