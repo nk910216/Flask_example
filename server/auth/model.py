@@ -76,11 +76,12 @@ class User(db.Model):
             'iat': datetime.datetime.utcnow(),
             'sub': self.id
         }
-        return jwt.encode(
+        token = jwt.encode(
             payload,
             current_app.config.get('SECRET_KEY'),
             algorithm='HS256',
         )
+        return bytes.decode(token)
 
     @classmethod
     def decode_auth_token(self, auth_token):
