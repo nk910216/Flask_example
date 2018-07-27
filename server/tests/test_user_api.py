@@ -28,10 +28,7 @@ class UserTest(BaseTest):
 
         return json.dumps(data, ensure_ascii=False).encode('utf8')
 
-    def test_register_api(self):
-        """ test register api with valid input
-        """
-
+    def add_user(self):
         user_input = {
             "username": self.TEST_USER_NAME,
             "password": self.TEST_USER_PASSWORD,
@@ -43,6 +40,11 @@ class UserTest(BaseTest):
                                  data=request_data,
                                  headers=request_header)
         self.assertEqual(response.status_code, 200)
+
+    def test_register_api(self):
+        """ test register api with valid input
+        """
+        self.add_user()
 
     def test_register_api_with_same_username(self):
         """ test register api with already exist user
@@ -79,3 +81,56 @@ class UserTest(BaseTest):
                                  data=request_data,
                                  headers=request_header)
         self.assertEqual(response.status_code, 400)
+
+    def test_user_login_api_with_corrent_data(self):
+        """ test register api with invalid content
+        """
+        self.add_user()
+
+        user_input = {
+            "username": self.TEST_USER_NAME,
+            "password": self.TEST_USER_PASSWORD,
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(user_input)
+        response = self.app.post('/api/user/login',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.data)
+        self.assertIn("token", response_data["data"])
+
+    def test_user_login_api_with_non_exist_user(self):
+        """ test register api with non exist user
+        """
+        self.add_user()
+
+        user_input = {
+            "username": self.TEST_USER_NAME + "_",
+            "password": self.TEST_USER_PASSWORD,
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(user_input)
+        response = self.app.post('/api/user/login',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_login_api_with_wrong_password(self):
+        """ test register api with wrong password
+        """
+        self.add_user()
+
+        user_input = {
+            "username": self.TEST_USER_NAME,
+            "password": self.TEST_USER_PASSWORD + "_",
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(user_input)
+        response = self.app.post('/api/user/login',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 401)
