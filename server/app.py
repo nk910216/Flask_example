@@ -83,3 +83,28 @@ def init_errorhandler(api):
     def user_wrong_password(error):
         ret = ErrorResponse(code=5, message="USER WRONG PASSWORD")
         return ret.get_json(), 401
+
+    @api.errorhandler(exceptions.InvalidPictureFormat)
+    def invalid_picture_format(error):
+        ret = ErrorResponse(code=6, message="PICTURE DATA IS NOT BASE64 ENCODE")
+        return ret.get_json(), 400
+
+    @api.errorhandler(exceptions.NoAuthToken)
+    def no_auth_token(error):
+        ret = ErrorResponse(code=7, message="NO AUTH TOKEN IN HEADER")
+        return ret.get_json(), 403
+
+    @api.errorhandler(exceptions.JWTExpireTime)
+    def jwt_expire(error):
+        ret = ErrorResponse(code=8, message="TOKEN EXPIRE TIME")
+        return ret.get_json(), 401
+
+    @api.errorhandler(exceptions.InvalidJWTToken)
+    def invalid_token(error):
+        ret = ErrorResponse(code=9, message="TOKEN INVALID")
+        return ret.get_json(), 401
+
+    @api.errorhandler(exceptions.UploadPictureFail)
+    def upload_picture_fail(error):
+        ret = ErrorResponse(code=10, message="UPLOAD PICTURE FAIL")
+        return ret.get_json(), 500
