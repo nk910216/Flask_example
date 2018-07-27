@@ -1,8 +1,11 @@
+from flask import json
+
 from server.auth import User
+from server.auth.utils import UserSchema
 
 from .base import BaseTest
 
-class UserApiTest(BaseTest):
+class UserTest(BaseTest):
 
     TEST_USER_NAME = 'test'
     TEST_USER_PASSWORD = 'test123'
@@ -12,32 +15,67 @@ class UserApiTest(BaseTest):
         """
         User.query.delete()
 
-    def test_user_verify_with_correct_password(self):
-        """ test the verify_user function for a exist user 
-            using correct password
-        """
-        user = User()
-        user.set_data(username=self.TEST_USER_NAME,
-                      password=self.TEST_USER_PASSWORD)
-        success = user.add_user()
-        self.assertTrue(success)
-        
-        query_user = User.query.first()
-        valid = query_user.verify_user(self.TEST_USER_PASSWORD)
-        self.assertTrue(valid)
+    @classmethod
+    def request_header(cls):
 
-    def test_user_verify_with_wrong_password(self):
-        """ test the verify_user function for a exist user 
-            using wrong password
-        """
-        user = User()
-        user.set_data(username=self.TEST_USER_NAME,
-                      password=self.TEST_USER_PASSWORD)
-        success = user.add_user()
-        self.assertTrue(success)
-        
-        wrong_password = self.TEST_USER_PASSWORD + "_"
-        query_user = User.query.first()
-        valid = query_user.verify_user(wrong_password)
-        self.assertFalse(valid)
+        request_header = {
+            'Content-Type': 'application/json'
+        }
+        return request_header
 
+    @classmethod
+    def encode_data(cls, data):
+
+        return json.dumps(data, ensure_ascii=False).encode('utf8')
+
+    def test_register_api(self):
+        """ test register api with valid input
+        """
+
+        user_input = {
+            "username": self.TEST_USER_NAME,
+            "password": self.TEST_USER_PASSWORD,
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(user_input)
+        response = self.app.post('/api/user/register',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 200)
+
+    def test_register_api_with_same_username(self):
+        """ test register api with already exist user
+        """
+
+        user_input = {
+            "username": self.TEST_USER_NAME,
+            "password": self.TEST_USER_PASSWORD,
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(user_input)
+        response = self.app.post('/api/user/register',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 200)
+        response = self.app.post('/api/user/register',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 409)
+
+    def test_register_api_with_empty_password(self):
+        """ test register api with invalid content
+        """
+
+        user_input = {
+            "username": self.TEST_USER_NAME,
+            "password": "",
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(user_input)
+        response = self.app.post('/api/user/register',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 400)
