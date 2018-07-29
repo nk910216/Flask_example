@@ -135,3 +135,13 @@ def init_errorhandler(api):
     def invalid_args(error):
         ret = ErrorResponse(code=11, message="INVALID QUERY ARGS")
         return ret.get_json(), 400
+
+    @api.errorhandler(exceptions.InvalidUsername)
+    def invalid_username(error):
+        ret = ErrorResponse(code=12, message="Username is too short/long")
+        return ret.get_json(), 400
+
+    @api.errorhandler(exceptions.InvalidPassword)
+    def invalid_username(error):
+        ret = ErrorResponse(code=13, message="Password is too short/long")
+        return ret.get_json(), 400

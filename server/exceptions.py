@@ -36,3 +36,11 @@ class UploadPictureFail(Exception):
 
 class InvalidArgs(Exception):
     pass
+
+
+class InvalidUsername(Exception):
+    pass
+
+
+class InvalidPassword(Exception):
+    pass
