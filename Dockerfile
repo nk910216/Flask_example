@@ -1,5 +1,7 @@
 FROM python:3.6
 
+RUN mkdir -p /var/log/gunicorn
+
 WORKDIR /usr/src/app
 
 ADD . /usr/src/app
