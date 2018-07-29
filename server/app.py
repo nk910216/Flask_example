@@ -1,3 +1,6 @@
+import logging
+import os
+
 from flask import Flask, current_app
 
 from .api.routes import api_bp, api
@@ -20,6 +23,9 @@ def init_app():
 
     # initialize the database
     init_db(app)
+
+    # connect the log to gunicorn
+    init_log(app)
 
     # initialize error handler
     init_errorhandler(api)
@@ -53,6 +59,21 @@ def init_route(app):
     api_uri_prefix = RouteConfig.API_URI_PREFIX
 
     app.register_blueprint(api_bp, url_prefix=api_uri_prefix)
+
+
+def init_log(app):
+    """Initialize the logging to gunicorn
+    """
+    is_gunicorn = "gunicorn" in os.environ.get("SERVER_SOFTWARE", "")
+    if not is_gunicorn:
+        app.logger.info('using flask default logger in init_log')
+        return
+
+    gunicorn_error_logger = logging.getLogger('gunicorn.error')
+    #  app.logger.handlers.extend(gunicorn_error_logger.handlers)
+    app.logger.handlers = gunicorn_error_logger.handlers
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('using gunicorn.error in init_log')
 
 
 def init_errorhandler(api):
@@ -112,5 +133,5 @@ def init_errorhandler(api):
 
     @api.errorhandler(exceptions.InvalidArgs)
     def invalid_args(error):
-        ret = ErrorResponse(code=2, message="INVALID QUERY ARGS")
+        ret = ErrorResponse(code=11, message="INVALID QUERY ARGS")
         return ret.get_json(), 400
