@@ -15,7 +15,7 @@ class Picture(db.Model):
     __table__name = 'picture'
 
     id = Column('Id', db.Integer, primary_key=True, autoincrement=True)
-    data = Column('data', db.Binary, nullable=False)
+    data = Column('data', db.LargeBinary, nullable=False)
 
     author_id = Column('AuthorID', db.String(STRING_LEN),
                        db.ForeignKey('user.Id',
