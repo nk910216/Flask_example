@@ -19,4 +19,5 @@ run:
 		-p 5000:5000 \
 		-d --name $(CONTAINER) \
 		--env-file ${env} \
+		--net ${net-name}\
 		$(IMAGE_FULL_NAME)
