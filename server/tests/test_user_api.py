@@ -82,6 +82,38 @@ class UserTest(BaseTest):
                                  headers=request_header)
         self.assertEqual(response.status_code, 400)
 
+    def test_register_api_with_tooshort_username(self):
+        """ test register api with too short username
+        """
+
+        user_input = {
+            "username": "a",
+            "password": self.TEST_USER_NAME,
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(user_input)
+        response = self.app.post('/api/user/register',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 400)
+
+    def test_register_api_with_tooshort_password(self):
+        """ test register api with too short password
+        """
+
+        user_input = {
+            "username": self.TEST_USER_NAME,
+            "password": "b",
+        }
+
+        request_header = self.request_header()
+        request_data = self.encode_data(user_input)
+        response = self.app.post('/api/user/register',
+                                 data=request_data,
+                                 headers=request_header)
+        self.assertEqual(response.status_code, 400)
+
     def test_user_login_api_with_corrent_data(self):
         """ test register api with invalid content
         """
