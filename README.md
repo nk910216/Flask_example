@@ -25,6 +25,12 @@ $ ./run.sh
 
 這個 script 會自動建立這兩個 service 且跑起來。一些可以設定的變數定義在了 script 的開頭。
 
+如果跑出類似 
+`Error response from daemon: network with name mithrik-hw-net already exists` 
+錯誤時，代表我重複創建了一個已存在的 docker network，為了避免將我的 docker container 隨意加入您的 network，請去 script 的開頭將 MY\_NETWORK\_NAME 改名。
+
+如果是重複跑了多次 run.sh 也會遇到相同問題。那麼請手動刪除 network MY\_NETWORK\_NAME，然後再跑一次。
+
  
 ## Build and Run Image
 
