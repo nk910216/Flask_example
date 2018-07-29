@@ -5,12 +5,14 @@ from sqlalchemy.orm.exc import NoResultFound
 from server.exceptions import (InvalidPostContent,
                                UserAlreadyExist,
                                UsernameNotExist,
-                               UserWrongPassword)
+                               UserWrongPassword,
+                               InvalidUsername,
+                               InvalidPassword)
 
 from server.responses import APIResponse
 
 from .model import User
-from .utils import UserSchema
+from .utils import UserSchema, valid_auth_string
 
 
 class RegisterHandler(Resource):
@@ -26,14 +28,22 @@ class RegisterHandler(Resource):
             raise InvalidPostContent
 
         args = input_data.data
+        username = args["username"]
+        password = args["password"]
+
+        if not valid_auth_string(username):
+            raise InvalidUsername
+        if not valid_auth_string(password):
+            raise InvalidPassword
+
         user = User()
-        user.set_data(username=args["username"],
-                      password=args["password"])
+        user.set_data(username=username,
+                      password=password)
         success = user.add_user()
         if not success:
             raise UserAlreadyExist
 
-        ret = APIResponse({'username': args["username"]})
+        ret = APIResponse({'username': username})
         return ret.get_json(), 200
 
 
