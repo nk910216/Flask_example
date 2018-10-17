@@ -1,4 +1,4 @@
-# Mithril Backend Homework
+# Flask server example
 
 這是一個 backend service, 用 python 的 Flask framework 完成。簡略地提供以下功能：
  
